@@ -22,7 +22,8 @@ if not os.path.exists(SAVE_DIR):
 
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
-    await message.reply("Hi! Send me a photo of the menu")
+    await message.reply("Привет! пришли мне фотографию меню")
+    # await message.reply("Hi! Send me a photo of the menu")
 
 
 @dp.message_handler(content_types=types.ContentTypes.PHOTO)
