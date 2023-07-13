@@ -1,8 +1,7 @@
 import logging
 import os
-import pytesseract as pt
-from PIL import Image
 import re
+import pytesseract as pt
 from aiogram import Bot, Dispatcher, executor, types
 
 
@@ -23,7 +22,6 @@ if not os.path.exists(SAVE_DIR):
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
     await message.reply("Привет! пришли мне фотографию меню")
-    # await message.reply("Hi! Send me a photo of the menu")
 
 
 @dp.message_handler(content_types=types.ContentTypes.PHOTO)
@@ -59,4 +57,3 @@ def find_matching_dishes(input_string, file_path):
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
-
