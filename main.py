@@ -1,16 +1,19 @@
 import logging
-import os
 import re
+import os
+from dotenv import load_dotenv
 import pytesseract as pt
 from aiogram import Bot, Dispatcher, executor, types
+from spoonacular import detect_food
 
+load_dotenv()
 
-API_TOKEN = '6014782678:AAHONZnfO_o2AvhJtzg_BBjIw2fb1_PSMc8'
+TG_API_TOKEN = os.getenv("TG_API_TOKEN")
 pt.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=API_TOKEN)
+bot = Bot(token=TG_API_TOKEN)
 dp = Dispatcher(bot)
 
 
@@ -34,8 +37,9 @@ async def process_photo(message: types.Message):
     file_save_path = os.path.join(SAVE_DIR, file_name)
     await photo_file.download(file_save_path)
     text = image_translator(file_save_path)
-    matched_dishes = find_matching_dishes(text, file_path)
-    await message.reply(f'ваши блюда: {matched_dishes}')
+    matched_dishes = detect_food(text)
+    # matched_dishes = find_matching_dishes(text, file_path)
+    await message.reply(f'ваши блюда: \n{matched_dishes}')
 
 
 def image_translator(image):
