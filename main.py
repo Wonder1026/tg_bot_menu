@@ -16,7 +16,6 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TG_API_TOKEN)
 dp = Dispatcher(bot)
 
-
 SAVE_DIR = 'user_menu_photos'
 if not os.path.exists(SAVE_DIR):
     os.makedirs(SAVE_DIR)
@@ -29,7 +28,6 @@ async def send_welcome(message: types.Message):
 
 @dp.message_handler(content_types=types.ContentTypes.PHOTO)
 async def process_photo(message: types.Message):
-    file_path = r"C:\Users\Oleg\Desktop\new_menu.txt"
     photo = message.photo[-1]
     photo_id = photo.file_id
     photo_file = await bot.get_file(photo_id)
@@ -37,8 +35,8 @@ async def process_photo(message: types.Message):
     file_save_path = os.path.join(SAVE_DIR, file_name)
     await photo_file.download(file_save_path)
     text = image_translator(file_save_path)
+    os.remove(file_save_path)
     matched_dishes = detect_food(text)
-    # matched_dishes = find_matching_dishes(text, file_path)
     await message.reply(f'ваши блюда: \n{matched_dishes}')
 
 
@@ -47,16 +45,6 @@ def image_translator(image):
     text = re.sub(r'\s+', ' ', text.strip())
     text = re.sub(r'[^a-zA-Zа-яА-Я\s]', '', text)
     return text
-
-
-def find_matching_dishes(input_string, file_path):
-    matching_dishes = []
-    with open(file_path, 'r') as file:
-        for line in file:
-            dish = line.strip()
-            if dish.lower() in input_string.lower():
-                matching_dishes.append(dish)
-    return matching_dishes
 
 
 if __name__ == '__main__':

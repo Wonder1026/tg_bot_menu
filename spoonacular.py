@@ -1,11 +1,9 @@
 import requests
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 
 
 load_dotenv()
-
-
 api_key = os.getenv("SPOONCULAR_API_KEY")
 
 
@@ -32,5 +30,3 @@ def detect_food(text):
     except requests.exceptions.RequestException as e:
         print("Произошла ошибка при выполнении запроса:", e)
         return None
-
-
