@@ -34,7 +34,6 @@ async def not_photo_handler(message: types.Message, state: FSMContext):
     keyboard = types.ReplyKeyboardMarkup()
     start_button = types.KeyboardButton(text="/start")
     keyboard.add(start_button)
-
     await message.answer("Пришли мне фотографию меню или Нажми кнопку /start, чтобы начать сначала.",
                          reply_markup=keyboard)
 
