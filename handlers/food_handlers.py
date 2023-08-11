@@ -11,6 +11,7 @@ from tools import image_translator
 from tools import UserState
 
 
+
 router = Router()
 
 SAVE_DIR = 'user_menu_photos'
@@ -19,7 +20,7 @@ if not os.path.exists(SAVE_DIR):
 
 
 @router.message(UserState.waiting_for_photo, F.photo)
-async def process_photo(message: types.Message, state: FSMContext):
+async def photo_handler(message: types.Message, state: FSMContext):
     await bot.download(
         message.photo[-1],
         destination=f"/tmp/{message.photo[-1].file_id}.jpg"
@@ -27,6 +28,15 @@ async def process_photo(message: types.Message, state: FSMContext):
     await state.update_data(photo_path=f"/tmp/{message.photo[-1].file_id}.jpg")
     await message.answer("Отлично! Теперь выберите язык для перевода:")
     await state.set_state(UserState.waiting_for_language)
+
+@router.message(UserState.waiting_for_photo)
+async def not_photo_handler(message: types.Message, state: FSMContext):
+    keyboard = types.ReplyKeyboardMarkup()
+    start_button = types.KeyboardButton(text="/start")
+    keyboard.add(start_button)
+
+    await message.answer("Пришли мне фотографию меню или Нажми кнопку /start, чтобы начать сначала.",
+                         reply_markup=keyboard)
 
 
 @router.message(UserState.waiting_for_language)
