@@ -10,15 +10,8 @@ from spoonacular import detect_food
 from tools import image_translator
 from tools import UserState
 
-from PIL import Image
-
 
 router = Router()
-
-SAVE_DIR = 'user_menu_photos'
-if not os.path.exists(SAVE_DIR):
-    os.makedirs(SAVE_DIR)
-
 
 @router.message(UserState.waiting_for_photo, F.photo)
 async def photo_handler(message: types.Message, state: FSMContext, bot):
@@ -27,7 +20,6 @@ async def photo_handler(message: types.Message, state: FSMContext, bot):
     await bot.download(
         message.photo[-1],
         destination=temp_file_path
-        # destination=f"C:/Users/Oleg/PycharmProjects/tg_bot_menu/user_menu_photos/{message.photo[-1].file_id}.jpg"
     )
     await state.update_data(photo_path=temp_file_path)
     await message.answer("Отлично! Теперь выберите язык для перевода:")
