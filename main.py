@@ -12,15 +12,16 @@ load_dotenv()
 
 TG_API_TOKEN = os.getenv("TG_API_TOKEN")
 
-dp = Dispatcher(storage=MemoryStorage())
-bot = Bot(TG_API_TOKEN)
+# dp = Dispatcher(storage=MemoryStorage())
+# bot = Bot(TG_API_TOKEN)
 
 async def main():
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
-
+    dp = Dispatcher(storage=MemoryStorage())
+    bot = Bot(TG_API_TOKEN)
     dp.include_router(start_handler.router)
     dp.include_router(food_handlers.router)
 

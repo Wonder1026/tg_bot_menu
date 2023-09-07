@@ -1,15 +1,16 @@
 import os
+import tempfile
 
 from aiogram import Router, F, types
 from aiogram.fsm.context import FSMContext
 
 from aiogram.types import Message, ReplyKeyboardRemove
 from spoonacular import detect_food
-from main import bot
 
 from tools import image_translator
 from tools import UserState
 
+from PIL import Image
 
 
 router = Router()
@@ -20,12 +21,15 @@ if not os.path.exists(SAVE_DIR):
 
 
 @router.message(UserState.waiting_for_photo, F.photo)
-async def photo_handler(message: types.Message, state: FSMContext):
+async def photo_handler(message: types.Message, state: FSMContext, bot):
+    temp_dir = tempfile.mkdtemp()
+    temp_file_path = os.path.join(temp_dir, f"{message.photo[-1].file_id}.jpg")
     await bot.download(
         message.photo[-1],
-        destination=f"/tmp/{message.photo[-1].file_id}.jpg"
+        destination=temp_file_path
+        # destination=f"C:/Users/Oleg/PycharmProjects/tg_bot_menu/user_menu_photos/{message.photo[-1].file_id}.jpg"
     )
-    await state.update_data(photo_path=f"/tmp/{message.photo[-1].file_id}.jpg")
+    await state.update_data(photo_path=temp_file_path)
     await message.answer("Отлично! Теперь выберите язык для перевода:")
     await state.set_state(UserState.waiting_for_language)
 

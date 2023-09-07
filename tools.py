@@ -2,7 +2,7 @@ import re
 import pytesseract as pt
 from aiogram.fsm.state import StatesGroup, State
 
-pt.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+# pt.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 
 class UserState(StatesGroup):
