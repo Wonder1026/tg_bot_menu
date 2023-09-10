@@ -15,6 +15,7 @@ TG_API_TOKEN = os.getenv("TG_API_TOKEN")
 # dp = Dispatcher(storage=MemoryStorage())
 # bot = Bot(TG_API_TOKEN)
 
+
 async def main():
     logging.basicConfig(
         level=logging.INFO,
