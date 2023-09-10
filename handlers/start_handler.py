@@ -11,8 +11,17 @@ router = Router()
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
-    await message.answer(
-        text="Привет! пришли мне фотографию меню",
-        reply_markup=ReplyKeyboardRemove()
+    kb = [
+        [
+            types.KeyboardButton(text="/start"),
+            types.KeyboardButton(text="/help")
+        ],
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        resize_keyboard=True,
+        input_field_placeholder="Загрузите фотографию или выберете команду снизу"
     )
+    await message.answer("Привет! пришли мне фотографию меню",
+                         reply_markup=keyboard)
     await state.set_state(UserState.waiting_for_photo)
