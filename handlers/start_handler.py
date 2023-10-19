@@ -14,12 +14,14 @@ async def cmd_start(message: types.Message, state: FSMContext):
     kb = [
         [
             types.KeyboardButton(text="/start"),
-            types.KeyboardButton(text="/help")
+            types.KeyboardButton(text="Инструкция"),
+            types.KeyboardButton(text="Начать сначала")
         ],
     ]
     keyboard = types.ReplyKeyboardMarkup(
         keyboard=kb,
         resize_keyboard=True,
+        one_time_keyboard=True,
         input_field_placeholder="Загрузите фотографию или выберете команду снизу"
     )
     await message.answer("Привет! пришли мне фотографию меню",

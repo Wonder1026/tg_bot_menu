@@ -24,8 +24,9 @@ def detect_food(text):
 
         data = response.json()
         dishes = [annotation["annotation"] for annotation in data["annotations"] if annotation["tag"] == "dish"]
+        # print(dishes)
         dish_names = "\n ".join(dishes)
-        return dish_names
+        return dishes
 
     except requests.exceptions.RequestException as e:
         print("Произошла ошибка при выполнении запроса:", e)
