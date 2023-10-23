@@ -3,22 +3,31 @@ import tempfile
 
 from aiogram import Router, F, types
 from aiogram.enums import ParseMode
+from aiogram.filters.callback_data import CallbackData
 from aiogram.fsm.context import FSMContext
 
+from aiogram import Dispatcher
 import aiogram.utils.markdown as md
-
-from aiogram.types import Message, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton
-from spoonacular import detect_food
+from aiogram.types import Message, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from spoonacular import detect_dishes, get_dish
 from aiogram.utils.markdown import link
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from tools import image_translator
 from tools import UserState
+from aiogram.types import InputFile
 
 from googletrans import Translator
 
 
 translator = Translator()
 router = Router()
+
+
+class MyCallback(CallbackData, prefix='my'):
+    dish: str
+    action: bool
+
+
 
 
 @router.message(UserState.waiting_for_photo, F.photo)
@@ -33,30 +42,60 @@ async def photo_handler(message: types.Message, state: FSMContext, bot):
     await state.update_data(photo_path=temp_file_path)
     text = image_translator(temp_file_path)
     eng_text = translator.translate(text, dest='en')
-    matched_dishes = detect_food(eng_text.text)
+    matched_dishes = detect_dishes(eng_text.text)
 
     # formatted_words = [md.hlink(word, url=f'tg://msg?text={word}') for word in matched_dishes]
     # formatted_words = [f"[{word}](tg://msg?text={word})" for word in matched_dishes]
     formatted_dishes = [f"[{dish}](tg://msg?text={dish})" for dish in matched_dishes]
     formatted_message = ', '.join(formatted_dishes)
     # text = link('VK', 'https://vk.com')
-    builder = InlineKeyboardBuilder()
-    builder.row(types.InlineKeyboardButton(
-        text="GitHub", url="https://github.com")
-    )
-    builder.row(types.InlineKeyboardButton(
-        text="Оф. канал Telegram",
-        url="tg://resolve?domain=telegram")
-    )
+    # builder = InlineKeyboardBuilder()
+    inline_keyboard = []
+    # builder = InlineKeyboardMarkup()
+    # vote_cb = CallbackData()
+
+
+
+
+    for dish in matched_dishes:
+        button = types.InlineKeyboardButton(text=dish,
+                                            callback_data=MyCallback(dish=dish, action=True).pack())
+        inline_keyboard.append([button])
+    reply_markup = types.InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+    await message.answer("Выберите блюдо из меню:", reply_markup=reply_markup)
+
+    # builder.row(types.InlineKeyboardButton(
+    #     text="GitHub", url="https://github.com")
+    # )
+    # builder.row(types.InlineKeyboardButton(
+    #     text="Оф. канал Telegram",
+    #     url="tg://resolve?domain=telegram")
+    # )
 
     # Чтобы иметь возможность показать ID-кнопку,
     # У юзера должен быть False флаг has_private_forwards
 
-    await message.answer(
-        'Выберите ссылку',
-        reply_markup=builder.as_markup(),
-    )
+    # await message.answer(
+    #     'Выберите ссылку',
+    #     reply_markup=builder.as_markup(),
+    # )
 
+
+@router.callback_query(MyCallback.filter(F.action == True))
+async def my_callback_foo(query: CallbackQuery, callback_data: MyCallback):
+    print(get_dish(callback_data.dish))
+    # photo = InputFile(callback_data.photo_url)
+    # await query.message.send_photo(chat_id, photo)
+    # get_dish(callback_data.dish)
+    await query.message.answer('asdffdsafdsa')
+    # print("dish =", callback_data.dish)
+# @router.callback_query()
+# async def process_callback(query: types.CallbackQuery, callback_data: dict):
+#     # Получите текст из callback_data
+#     text_from_button = callback_data['dish']
+#     print(callback_data)
+#     # Отправьте текст в сообщении
+#     await query.message.answer(f"Вы выбрали: {text_from_button}")
 
 # await message.reply('<a href="https://vk.com/id41732290">VK</a>', parse_mode="HTML")
     #
