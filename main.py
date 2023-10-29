@@ -16,7 +16,6 @@ from tools import image_translator
 from googletrans import Translator
 from tools import UserState
 
-
 load_dotenv()
 
 TG_API_TOKEN = os.getenv("TG_API_TOKEN")
@@ -93,14 +92,31 @@ async def not_photo_handler(message: types.Message, state: FSMContext):
     await message.answer("not photo handler")
 
 
-
 # @dp.callback_query(MyCallback.filter(F.action == True))
 @dp.callback_query(MyCallback.filter(F.action == True))
 async def my_callback_foo(query: CallbackQuery, callback_data: MyCallback):
     items = get_single_item(callback_data.dish)
-    photo_url = items['image_url']
-    print(photo_url)
-    await bot.send_photo(chat_id=query.message.chat.id, photo=photo_url)
+    photo_url = items[1]
+    ing = ', '.join(items[0])
+    # ing = items[0]
+    res = []
+    # for item in ing:
+    #     trans = translator.translate(item, dest='ru')
+    #     res.append(trans.text)
+    print(res)
+    # trans = ', '.join(res)
+    try:
+        trans = translator.translate(ing, dest='ru')
+        await bot.send_photo(chat_id=query.message.chat.id, photo=photo_url)
+        await query.message.answer(f'Ингредиенты: {trans.text.lower()}')
+
+    except:
+        await query.message.answer('Произошла ошибка при выполнении запроса')
+
+    #
+    # print(trans.text)
+    # print(photo_url)
+    # await bot.send_photo(chat_id=query.message.chat.id, photo=photo_url)
 
     # photo = InputFile(callback_data.photo_url)
     # await query.message.send_photo(chat_id, photo)
@@ -111,10 +127,10 @@ async def my_callback_foo(query: CallbackQuery, callback_data: MyCallback):
 async def main():
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
+
 if __name__ == '__main__':
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
     asyncio.run(main())
-
