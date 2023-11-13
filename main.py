@@ -42,18 +42,6 @@ class LangCallback(CallbackData, prefix='lg'):
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
-    kb = [
-        [
-            types.KeyboardButton(text="/start"),
-            types.KeyboardButton(text="Инструкция"),
-        ],
-    ]
-    keyboard = types.ReplyKeyboardMarkup(
-        keyboard=kb,
-        resize_keyboard=True,
-        one_time_keyboard=True,
-        input_field_placeholder="Загрузите фотографию или выберете команду снизу"
-    )
 
     inline_keyboard = []
     languages = ['rus', 'eng', 'deu']
