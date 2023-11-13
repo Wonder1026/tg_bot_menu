@@ -68,7 +68,6 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
 @dp.message(UserState.waiting_for_photo, F.photo)
 async def photo_handler(message: types.Message, state: FSMContext, bot):
-    print('IN PHOTO HANDLER')
     temp_dir = tempfile.mkdtemp()
     temp_file_path = os.path.join(temp_dir, f"{message.photo[-1].file_id}.jpg")
     await bot.download(
