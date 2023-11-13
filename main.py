@@ -20,6 +20,7 @@ load_dotenv()
 
 TG_API_TOKEN = os.getenv("TG_API_TOKEN")
 
+
 dp = Dispatcher(storage=MemoryStorage())
 bot = Bot(TG_API_TOKEN)
 
@@ -63,7 +64,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
     reply_markup = types.InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
-    await message.answer("выберите язык меню", reply_markup=reply_markup)
+    await message.answer("Выберите язык меню", reply_markup=reply_markup)
 
 
 @dp.message(UserState.waiting_for_photo, F.photo)
@@ -79,16 +80,21 @@ async def photo_handler(message: types.Message, state: FSMContext, bot):
     text = image_translator(temp_file_path, lg=language)
 
     if text:
+        print(text)
         eng_text = translator.translate(text, dest='en')
-
+        print(eng_text)
     matched_dishes = []
     if text:
         matched_dishes = detect_dishes(eng_text.text)
 
 
+
     inline_keyboard = []
+
     if matched_dishes:
+        # for dish in matched_dishes:
         for dish in matched_dishes:
+
             new_dish = translator.translate(dish, dest='ru')
             button = types.InlineKeyboardButton(text=new_dish.text,
                                                 callback_data=MyCallback(dish=dish, action=True).pack())
@@ -101,7 +107,14 @@ async def photo_handler(message: types.Message, state: FSMContext, bot):
 
 @dp.message(UserState.waiting_for_photo)
 async def not_photo_handler(message: types.Message, state: FSMContext):
-    await message.answer("пришлите фотографию меню или выберите команду из menu")
+    if message.text == 'Инструкция':
+        await message.answer('''Чтобы начать сначала - нажмите кнопку /start
+        1 - Выберите язык вашего меню из предложенных в сообщении
+        2 - Загрузите изображение вашего меню
+        3 - Выберите любое блюдо чтобы получить его состав и фотографию
+              ''')
+    else:
+        await message.answer("Пришлите фотографию меню или выберите команду из menu")
 
 
 @dp.callback_query(MyCallback.filter(F.action == True))
@@ -121,9 +134,21 @@ async def my_callback_foo(query: CallbackQuery, callback_data: MyCallback):
 
 @dp.callback_query(LangCallback.filter(F.act == True))
 async def lang_callback(query: CallbackQuery, callback_data: LangCallback, state: FSMContext):
+    kb = [
+        [
+            types.KeyboardButton(text="/start"),
+            types.KeyboardButton(text="Инструкция"),
+        ],
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        resize_keyboard=True,
+        one_time_keyboard=True,
+        input_field_placeholder="Загрузите фотографию или выберете команду снизу"
+    )
     global language
     language = callback_data.lang
-    await query.message.answer("пришлите мне фотографию меню")
+    await query.message.answer("Пришли мне фотографию меню", reply_markup=keyboard)
     await state.set_state(UserState.waiting_for_photo)
 
 
