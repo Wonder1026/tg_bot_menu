@@ -15,20 +15,21 @@ from spoonacular import detect_dishes, get_single_item
 from tools import image_translator
 from googletrans import Translator
 from tools import UserState
-
+from aiogram.client.session.aiohttp import AiohttpSession
 load_dotenv()
 
 TG_API_TOKEN = os.getenv("TG_API_TOKEN")
 
 
 dp = Dispatcher(storage=MemoryStorage())
-bot = Bot(TG_API_TOKEN)
 
+PROXY_URL = "http://proxy.server:3128"
 translator = Translator()
-
+session = AiohttpSession(proxy=PROXY_URL)
 language = 'eng'
+bot = Bot(TG_API_TOKEN, session=session)
 
-
+REQUEST_KWARGS = {'proxy_url': 'http://proxy.server:3128'}
 class MyCallback(CallbackData, prefix='my'):
     dish: str
     action: bool
